@@ -19,11 +19,13 @@ run {
   args = ["server", "config/analytics.yml"]
 }
 
-
 dependencies {
   compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
-  compile group: 'io.dropwizard', name: 'dropwizard-core', version: '1.3.5'
+  compile "io.dropwizard:dropwizard-core:1.3.5"
   compile "com.fasterxml.jackson.module:jackson-module-kotlin:2.9.7"
+  compile "io.projectreactor:reactor-core:3.2.0.RELEASE"
+  compile "io.projectreactor.kafka:reactor-kafka:1.0.0.RELEASE"
+
   testCompile group: 'junit', name: 'junit', version: '4.12'
 }
 

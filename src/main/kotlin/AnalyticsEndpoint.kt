@@ -1,24 +1,33 @@
 import com.codahale.metrics.annotation.Timed
-import io.dropwizard.Configuration
-import org.hibernate.validator.constraints.NotEmpty
+import reactor.kafka.sender.SenderResult
 import javax.ws.rs.*
+import javax.ws.rs.container.AsyncResponse
+import javax.ws.rs.container.Suspended
 import javax.ws.rs.core.MediaType
-
-class AnalyticsConfiguration : Configuration() {
-  @NotEmpty
-  lateinit var message: String
-}
+import javax.ws.rs.core.Response
 
 data class AnalyticsRequest(val action: String)
 
 @Path("/analytics")
 @Consumes(MediaType.APPLICATION_JSON)
-class AnalyticsResource(private val message: String) {
+@Produces(MediaType.APPLICATION_JSON)
+class AnalyticsResource(private val writer: AnalyticsWriter) {
 
   @POST
   @Timed
   @Path("{clientId}")
-  fun logEvent(@PathParam("clientId") clientId: String, request: AnalyticsRequest) {
-    println("ClientId is $clientId and request is $request and message is $message")
+  fun logEvent(@PathParam("clientId") clientId: String, request: AnalyticsRequest, @Suspended asyncResponse: AsyncResponse) {
+    writer.write(clientId, request.action).subscribe(
+        { result -> handleResponse(result, asyncResponse) },
+        { _ -> asyncResponse.resume(Response.serverError()) }
+    )
+  }
+
+  private fun handleResponse(result: SenderResult<String>, asyncResponse: AsyncResponse) {
+    if (result.exception() != null) {
+      asyncResponse.resume(Response.serverError())
+    } else {
+      asyncResponse.resume(Response.noContent())
+    }
   }
 }

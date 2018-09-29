@@ -1,0 +1,17 @@
+version: '3'
+services:
+  kafka:
+    image: "spotify/kafka"
+    ports:
+    - "9092:9092"
+    - "2181:2181"
+  app:
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+      args:
+        BOOTSTRAP_SERVERS: kafka:9092
+    ports:
+      - "8080:8080"
+    links:
+    - kafka
