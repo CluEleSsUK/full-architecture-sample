@@ -1,3 +1,2 @@
-rootProject.name = 'dropwizard-kafka'
-include 'gateway'
+rootProject.name = "gateway"
 

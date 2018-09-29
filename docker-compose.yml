@@ -3,15 +3,36 @@ services:
   kafka:
     image: "spotify/kafka"
     ports:
-    - "9092:9092"
-    - "2181:2181"
+      - "9092:9092"
+      - "2181:2181"
+
   gateway:
     build:
-      context: .
-      dockerfile: ./gateway/Dockerfile
-      args:
-        BOOTSTRAP_SERVERS: kafka:9092
+      context: ./gateway
+      dockerfile: ./Dockerfile
+    environment:
+      BOOTSTRAP_SERVERS: kafka:9092
     ports:
       - "8080:8080"
     links:
-    - kafka
+      - kafka
+
+  cassandra:
+    image: "bitnami/cassandra"
+    ports:
+      - "9042:9042"
+      - "7000:7000"
+    environment:
+      CASSANDRA_CLUSTER_NAME: "event-retention"
+
+  eventRetention:
+    build:
+      context: ./event-retention
+      dockerfile: ./Dockerfile
+    environment: 
+      BOOTSTRAP_SERVERS: kafka:9092
+      CASSANDRA_CLUSTER_NAME: "event-retention"
+      CASSANDRA_PORT: 9042
+    links:
+      - kafka
+      - cassandra

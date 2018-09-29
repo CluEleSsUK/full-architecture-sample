@@ -1,0 +1,16 @@
+spring:
+  application:
+    name: event-retention
+  kafka:
+    bootstrap-servers: ${BOOTSTRAP_SERVERS:"localhost:9092"}
+    consumer:
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+  data:
+    cassandra:
+      cluster-name: ${CASSANDRA_CLUSTER_NAME:"event-retention"}
+      port: ${CASSANDRA_PORT:9142}
+      keyspace-name: analytics
+      schema-action: create_if_not_exists
+      consistency-level: local_quorum
+
