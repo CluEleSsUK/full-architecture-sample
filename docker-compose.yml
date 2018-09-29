@@ -5,10 +5,10 @@ services:
     ports:
     - "9092:9092"
     - "2181:2181"
-  app:
+  gateway:
     build:
       context: .
-      dockerfile: ./Dockerfile
+      dockerfile: ./gateway/Dockerfile
       args:
         BOOTSTRAP_SERVERS: kafka:9092
     ports:
